@@ -17,14 +17,6 @@ class Client:
 	PLAY = 1
 	PAUSE = 2
 	TEARDOWN = 3
-
-	SETUP_STR = 'SETUP'
-	PLAY_STR = 'PLAY'
-	PAUSE_STR = 'PAUSE'
-	TEARDOWN_STR = 'TEARDOWN'
-
-	RTSP_VER = "RTSP/1.0"
-	TRANSPORT = "RTP/UDP"
 	
 	def __init__(self, master, serveraddr, serverport, rtpport, filename):
 		self.master = master
@@ -82,7 +74,8 @@ class Client:
 		"""Teardown button handler."""
 		self.sendRtspRequest(self.TEARDOWN)		
 		self.master.destroy() # Close the gui window
-		os.remove(CACHE_FILE_NAME + str(self.sessionId) + CACHE_FILE_EXT) # Delete the cache image from video
+		if self.state != self.INIT:
+			os.remove(CACHE_FILE_NAME + str(self.sessionId) + CACHE_FILE_EXT) # Delete the cache image from video
 
 	def pauseMovie(self):
 		"""Pause button handler."""
@@ -102,14 +95,13 @@ class Client:
 		"""Listen for RTP packets."""
 		while True:
 			try:
-				print("Listening...")
 				data = self.rtpSocket.recv(20480)
 				if data:
 					rtpPacket = RtpPacket()
 					rtpPacket.decode(data)
 					
 					currFrameNbr = rtpPacket.seqNum()
-					print ("CURRENT SEQUENCE NUM: " + str(currFrameNbr))
+					#print ("CURRENT SEQUENCE NUM: " + str(currFrameNbr))
 										
 					if currFrameNbr > self.frameNbr: # Discard the late packet
 						self.frameNbr = currFrameNbr
@@ -158,9 +150,9 @@ class Client:
 			self.rtspSeq+=1
 			
 			# Write the RTSP request to be sent.
-			request = "%s %s %s" % (self.SETUP_STR,self.fileName,self.RTSP_VER)
-			request+="\nCSeq: %d" % self.rtspSeq
-			request+="\nTransport: %s; client_port= %d" % (self.TRANSPORT,self.rtpPort)
+			request = "SETUP " + str(self.fileName) + " RTSP/1.0\n"
+			request+= "CSeq: " + str(self.rtspSeq) + "\n"
+			request+= "Transport: RTP/UDP; client_port= " + str(self.rtpPort)
 			
 			# Keep track of the sent request.
 			self.requestSent = self.SETUP
@@ -172,9 +164,9 @@ class Client:
 			self.rtspSeq+=1
         
 			# Write the RTSP request to be sent.
-			request = "%s %s %s" % (self.PLAY_STR,self.fileName,self.RTSP_VER)
-			request+="\nCSeq: %d" % self.rtspSeq
-			request+="\nSession: %d"%self.sessionId
+			request = "PLAY " + str(self.fileName) + " RTSP/1.0\n"
+			request += "CSeq: " + str(self.rtspSeq) + "\n"
+			request += "Session: " + str(self.sessionId)
                 
 			# Keep track of the sent request.
 			self.requestSent = self.PLAY
@@ -185,9 +177,9 @@ class Client:
 			# Update RTSP sequence number.
 			self.rtspSeq+=1
 			
-			request = "%s %s %s" % (self.PAUSE_STR,self.fileName,self.RTSP_VER)
-			request+="\nCSeq: %d" % self.rtspSeq
-			request+="\nSession: %d"%self.sessionId
+			request = "PAUSE " + str(self.fileName) + " RTSP/1.0\n"
+			request += "CSeq: " + str(self.rtspSeq) + "\n"
+			request += "Session: " + str(self.sessionId)
 			
 			self.requestSent = self.PAUSE
 			
@@ -198,9 +190,9 @@ class Client:
 			self.rtspSeq+=1
 			
 			# Write the RTSP request to be sent.
-			request = "%s %s %s" % (self.TEARDOWN_STR, self.fileName, self.RTSP_VER)
-			request+="\nCSeq: %d" % self.rtspSeq
-			request+="\nSession: %d" % self.sessionId
+			request = "TEARDOWN " + str(self.fileName) + " RTSP/1.0\n"
+			request += "CSeq: " + str(self.rtspSeq) + "\n"
+			request += "Session: " + str(self.sessionId)
 			
 			self.requestSent = self.TEARDOWN
 
@@ -263,7 +255,6 @@ class Client:
 	
 	def openRtpPort(self):
 		"""Open RTP socket binded to a specified port."""
-
 		# Create a new datagram socket to receive RTP packets from the server
 		self.rtpSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             
