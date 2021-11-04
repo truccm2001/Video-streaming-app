@@ -277,7 +277,7 @@ class Client:
 
                     elif self.requestSent == self.DESCRIBE:
                         # Write RTSP payload to session file
-                        f = open(SESSION_FILE, "w")
+                        f = open(SESSION_FILE, "a")
                         for i in range(4, len(lines)):
                             f.write(lines[i] + '\n')
                         f.close()
