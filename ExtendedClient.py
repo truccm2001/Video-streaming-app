@@ -41,6 +41,7 @@ class Client:
         self.startTime = 0
         self.lossCounter = 0
         self.firstPlay = True
+        self.finish_time = 0
 
 	# Initiatio
 	# THIS GUI IS JUST FOR REFERENCE ONLY, STUDENTS HAVE TO CREATE THEIR OWN GUI
@@ -85,11 +86,28 @@ class Client:
     def exitClient(self):
         """Teardown button handler"""
         self.sendRtspRequest(self.TEARDOWN)
-
+        
+    
         if self.frameNbr != 0:
+            f = open(SESSION_FILE, "a")
+            
+            if self.finish_time == 0:
+                self.finish_time = time.time()
+            
+            #transfer rate:
+            dataRate = int(self.bytesReceived / (self.finish_time - self.startTime)) 
+            f.write("\n======================= Data Rate ========================\n")
+            f.write("Video data rate: " + str(dataRate) + " bytes/sec \n" )
+            f.write("Start time (since epoch): " + str(self.startTime) + "s\n")
+            f.write("End time (since epoch): " + str(self.finish_time) + "s\n\n")
+            print("Video data rate: " + str(dataRate) + " bytes/sec \n")
+              
+            # loss rate
             lossRate = self.lossCounter / self.frameNbr
             print("RTP Packet Loss Rate: " + str(lossRate) +" %\n")
-
+            f.write("\n==================== Packet Loss Rate ====================\n")
+            f.write("RTP Packet Loss Rate: " + str(lossRate) +" %\n\n")
+            
         self.master.destroy()
         if self.requestSent != -1:
             os.remove(CACHE_FILE_NAME + str(self.sessionId) + CACHE_FILE_EXT)
@@ -137,7 +155,7 @@ class Client:
                     currFrameNbr = rtpPacket.seqNum()
                     #print ("CURRENT SEQUENCE NUM: " + str(currFrameNbr))
 
-                    if currFrameNbr > self.frameNbr:
+                    if currFrameNbr > self.frameNbr: # Discard late package
                         # Count the received bytes
                         self.bytesReceived += len(rtpPacket.getPayload())
 
@@ -147,6 +165,8 @@ class Client:
                         # Show the current streaming time
                         currentTime = int(currFrameNbr * 0.05)
                         remainingTime = self.totalTime - currentTime
+                        if remainingTime <= 0:
+                            self.finish_time = time.time()
                         self.timeBox2.configure(text="Remaining time:" + "%02d:%02d" % (remainingTime // 60, remainingTime % 60))
             except:
                 if self.playEvent.isSet():
@@ -269,7 +289,13 @@ class Client:
 
                         # Calculate the video data rate
                         dataRate = int(self.bytesReceived / (time.time() - self.startTime))
-                        print("Video data rate: " + str(dataRate) + " bytes/sec\n")
+                        
+                        f = open(SESSION_FILE, "a")
+                        f.write("\n======================= Data Rate ========================\n")
+                        f.write("Video data rate: " + str(dataRate) + " bytes/sec \n" )
+                        f.write("Start time (since epoch): " + str(self.startTime) + "s\n")
+                        f.write("End time (since epoch): " + str(time.time()) + "s\n\n")
+                        print("Video data rate: " + str(dataRate) + " bytes/sec \n")
 
                     elif self.requestSent == self.TEARDOWN:
                         self.state = self.INIT
