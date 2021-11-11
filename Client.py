@@ -102,8 +102,8 @@ class Client:
 					
 					currFrameNbr = rtpPacket.seqNum()
 					#print ("CURRENT SEQUENCE NUM: " + str(currFrameNbr))
-										
-					if currFrameNbr > self.frameNbr: # Discard the late packet
+										#Xem lai
+					if currFrameNbr > self.frameNbr: # Discard the late packet (we ignore if some images is loss or late)
 						self.frameNbr = currFrameNbr
 						self.updateMovie(self.writeFrame(rtpPacket.getPayload()))
 			except:
@@ -125,7 +125,7 @@ class Client:
 		file.write(data)
 		file.close()
 		return cachename
-	
+	#Get image from cache to display here
 	def updateMovie(self, imageFile):
 		"""Update the image file as video frame in the GUI."""
 		photo = ImageTk.PhotoImage(Image.open(imageFile))
