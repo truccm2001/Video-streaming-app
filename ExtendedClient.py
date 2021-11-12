@@ -121,6 +121,8 @@ class Client:
         """Play button handler"""
         # First time PLAY is clicked, send SETUP
         if self.state == self.INIT and self.firstPlay:
+            file = open(SESSION_FILE, "w")
+            file.close()
             self.sendRtspRequest(self.SETUP)
             self.firstPlay = False
             while self.state != self.READY:
