@@ -162,7 +162,9 @@ class ServerWorker:
             if describe:
                 reply += '\n\n\n'
                 reply += '====================== Description =======================\n'
-                reply += 'Frame nubmer: '
+                reply += 'Session: '
+                reply += str(self.clientInfo['session'])
+                reply += '\nFrame nubmer: '
                 reply += str(self.clientInfo['videoStream'].frameNbr())
                 reply += '\nState: '
                 if self.state == 0:
