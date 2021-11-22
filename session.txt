@@ -1,0 +1,36 @@
+
+====================== Description =======================
+Session: 741077
+Frame nubmer: 19
+State: Playing
+Sent at: 22/11/2021 22:34:02
+
+
+======================= Data Rate ========================
+Video data rate: 102758 bytes/sec 
+Start time (since epoch): 1637595241.310269s
+End time (since epoch): 1637595244.630073s
+
+
+====================== Description =======================
+Session: 741077
+Frame nubmer: 53
+State: Ready
+Sent at: 22/11/2021 22:34:05
+
+
+======================= Data Rate ========================
+Video data rate: 115820 bytes/sec 
+Start time (since epoch): 1637595247.1020854s
+End time (since epoch): 1637595250.4314895s
+
+
+======================= Data Rate ========================
+Video data rate: 98140 bytes/sec 
+Start time (since epoch): 1637595247.1020854s
+End time (since epoch): 1637595251.0301054s
+
+
+==================== Packet Loss Rate ====================
+RTP Packet Loss Rate: 0.0 %
+
