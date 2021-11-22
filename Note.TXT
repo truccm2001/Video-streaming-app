@@ -1,2 +1,0 @@
-File RtpPacket tui copy giống phần của Trúc share để chạy thử
-Nếu có chỉnh sửa thì chỉnh sửa lại nha
